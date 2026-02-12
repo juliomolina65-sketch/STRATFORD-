@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stratford Academy — Edge Finder v4</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#050508;color:#f0f0f5;font-family:'Geist Mono','SF Mono',monospace;min-height:100vh;-webkit-font-smoothing:antialiased}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:#0a0a0f}::-webkit-scrollbar-thumb{background:#2a2a35;border-radius:3px}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+@keyframes ring{0%{transform:scale(1);opacity:.5}100%{transform:scale(3);opacity:0}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+@keyframes glow{0%,100%{box-shadow:0 0 15px rgba(0,255,136,.08)}50%{box-shadow:0 0 30px rgba(0,255,136,.15)}}
+.hdr{padding:24px 28px 20px;border-bottom:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(0,255,136,.015)0%,transparent 100%);position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:28px;right:28px;height:1px;background:linear-gradient(90deg,transparent,rgba(0,255,136,.15),transparent)}
+.hr{display:flex;align-items:center;justify-content:space-between}.logo{display:flex;align-items:center;gap:14px}
+.logo-mark{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#00ff88,#00cc6a);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#050508;font-family:'Outfit',sans-serif}
+.tt{font-size:22px;font-weight:800;color:#f0f0f5;letter-spacing:-.5px;font-family:'Outfit',sans-serif}.tt span{color:#00ff88}
+.su{font-size:11px;color:#555;margin-top:2px;letter-spacing:2px;font-weight:500}
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:9px;font-weight:700;color:#050508;background:#00ff88;padding:3px 8px;border-radius:4px;letter-spacing:1px;margin-left:10px}
+.status{text-align:right}.status-dot{display:flex;align-items:center;gap:5px;justify-content:flex-end}
+.dot-w{position:relative;display:inline-block;width:8px;height:8px}.dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#00ff88;animation:pulse 2s ease-in-out infinite}
+.dot-r{position:absolute;width:8px;height:8px;border-radius:50%;background:#00ff88;opacity:.4;animation:ring 2s ease-in-out infinite}
+.spn{display:inline-block;width:12px;height:12px;border:2px solid #00ff88;border-top-color:transparent;border-radius:50%;animation:spin .7s linear infinite}
+.status-label{font-size:10px;letter-spacing:1.5px;font-weight:600}.status-time{font-size:10px;color:#444;margin-top:3px}
+.stats{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;border-bottom:1px solid rgba(255,255,255,.06)}
+.stat{padding:16px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.04)}.stat:last-child{border-right:none}
+.stat-label{font-size:9px;color:#555;letter-spacing:2.5px;margin-bottom:6px;font-weight:600}
+.stat-val{font-size:26px;font-weight:900;font-family:'Outfit',sans-serif;letter-spacing:-1px}
+.tabs{display:flex;border-bottom:1px solid rgba(255,255,255,.06)}
+.tab{flex:1;padding:14px 12px;background:none;border:none;border-bottom:3px solid transparent;color:#555;cursor:pointer;font-size:11px;font-weight:600;font-family:'Geist Mono',monospace;letter-spacing:.5px;transition:all .2s}
+.tab:hover{color:#888;background:rgba(255,255,255,.02)}.tab.on{border-bottom-color:#00ff88;color:#00ff88;background:rgba(0,255,136,.04)}
+.sps{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.06);overflow-x:auto}
+.sp{flex:1;padding:12px 8px;background:none;border:none;border-bottom:3px solid transparent;color:#555;cursor:pointer;font-size:10px;font-weight:600;font-family:'Geist Mono',monospace;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s}
+.sp:hover{color:#888;background:rgba(255,255,255,.02)}.sp.on{border-bottom-color:#00ff88;color:#00ff88;background:rgba(0,255,136,.04)}
+.sp-count{font-size:8px;padding:2px 7px;border-radius:10px;font-weight:800}
+.sets{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;background:rgba(255,255,255,.015)}
+.set-label{font-size:9px;color:#555;letter-spacing:2.5px;margin-bottom:5px;font-weight:600}
+.set-sel{width:100%;padding:8px 10px;background:#0c0c14;border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:13px;font-family:'Geist Mono',monospace;font-weight:600;cursor:pointer;color:#eee}
+.rbtn{width:calc(100% - 40px);padding:12px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);border-radius:8px;color:#00ff88;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:1.5px;font-family:'Geist Mono',monospace;margin:12px 20px;transition:all .2s}
+.rbtn:hover{background:rgba(0,255,136,.1)}.rbtn:disabled{background:rgba(255,255,255,.02);color:#555;cursor:wait}
+.card{margin:0 16px 8px;border-radius:12px;background:#0a0a12;border:1px solid rgba(255,255,255,.06);cursor:pointer;overflow:hidden;animation:fadeUp .4s ease both;transition:all .2s}
+.card:hover{border-color:rgba(255,255,255,.1)}.card.ex{background:#0e0e1a;animation:glow 3s ease-in-out infinite}
+.card-main{padding:18px 20px}.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.pick-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}.pick-icon{font-size:18px}
+.pick-name{font-size:15px;font-weight:800;color:#f0f0f5;font-family:'Outfit',sans-serif}
+.edge-badge{font-size:9px;font-weight:800;padding:3px 8px;border-radius:4px;letter-spacing:1px}
+.game-name{font-size:11px;color:#777;margin-top:4px}.game-meta{font-size:10px;color:#444;margin-top:2px}
+.edge-num{font-size:28px;font-weight:900;font-family:'Outfit',sans-serif;letter-spacing:-1px}
+.edge-lbl{font-size:8px;color:#555;letter-spacing:3px;font-weight:600;margin-top:2px}
+.odds{display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-top:1px solid rgba(255,255,255,.04);margin-top:8px}
+.odds-label{font-size:8px;color:#555;letter-spacing:2px;font-weight:600}.odds-val{font-size:20px;font-weight:900;font-family:'Outfit',sans-serif}
+.odds-book{font-size:9px;color:#444;margin-top:2px}.odds-vs{font-size:10px;color:#333;font-weight:900;letter-spacing:2px}
+.ebar{height:4px;background:#111;border-radius:2px;margin-top:8px;overflow:hidden}.efill{height:100%;border-radius:2px}
+.excon{padding:16px 20px;border-top:1px solid rgba(255,255,255,.04);background:rgba(255,255,255,.01)}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dbox{padding:12px;border-radius:8px;text-align:center}.dbox-label{font-size:8px;letter-spacing:2.5px;font-weight:600;margin-bottom:4px}
+.dbox-val{font-size:22px;font-weight:900;font-family:'Outfit',sans-serif}.dbox-sub{font-size:9px;color:#555;margin-top:3px}
+.play-box{padding:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:11px;line-height:2;color:#999}
+.play-title{font-size:9px;color:#555;letter-spacing:3px;font-weight:700;margin-bottom:8px}
+.action-box{padding:12px;border-radius:8px;margin-top:10px;text-align:center;cursor:pointer}.action-box:hover{filter:brightness(1.2)}
+.action-text{font-size:11px;font-weight:800}.action-sub{font-size:9px;color:#555;margin-top:3px}
+.gcard{margin:0 16px 6px;padding:14px 18px;border-radius:10px;background:#0a0a12;border:1px solid rgba(255,255,255,.04);animation:fadeUp .3s ease both}
+.gcard.matched{border-color:rgba(0,255,136,.08);background:#0a0a14}
+.gtop{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.gname{font-size:12px;font-weight:700;color:#ccc;display:flex;align-items:center;gap:8px;font-family:'Outfit',sans-serif}
+.gtime{font-size:9px;color:#444;font-weight:600}
+.godds{display:flex;justify-content:space-between;align-items:center}
+.godds-label{font-size:8px;color:#555;letter-spacing:2px;font-weight:600}.godds-val{font-size:16px;font-weight:800;font-family:'Outfit',sans-serif;margin-top:2px}
+.godds-sub{font-size:8px;margin-top:2px}
+.empty{text-align:center;padding:60px 20px}.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-title{font-size:16px;font-weight:700;color:#555;font-family:'Outfit',sans-serif}
+.empty-sub{font-size:11px;color:#444;margin-top:8px;line-height:1.8}
+.footer{padding:20px;border-top:1px solid rgba(255,255,255,.04);text-align:center;margin-top:12px}
+.footer-text{font-size:9px;color:#333;letter-spacing:2px}
+.err-box{margin:10px 20px;padding:12px 16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.15);border-radius:8px;font-size:11px;color:#ff6666}
+.info-box{margin:10px 20px;padding:12px 16px;background:rgba(0,255,136,.04);border:1px solid rgba(0,255,136,.1);border-radius:8px;font-size:11px;color:#00ff88;font-weight:500}
+.log-box{padding:12px 14px;background:#0a0a12;border:1px solid rgba(255,255,255,.06);border-radius:8px;font-size:10px;color:#666;max-height:500px;overflow-y:auto;line-height:1.8}
+.log-box div{border-bottom:1px solid rgba(255,255,255,.02);padding:2px 0}
+.live-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#00ff88;margin-right:4px;animation:pulse 1.5s infinite}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const OK="f4e92d69120b28f6b547f6ebc92d15f6",OB="https://api.the-odds-api.com/v4",GM="https://gamma-api.polymarket.com";
+const PX=[u=>"https://corsproxy.io/?"+encodeURIComponent(u),u=>"https://api.allorigins.win/raw?url="+encodeURIComponent(u),u=>"https://api.codetabs.com/v1/proxy?quest="+encodeURIComponent(u)];
+let px=0;
+async function gF(url){
+  try{const r=await fetch(url,{signal:AbortSignal.timeout(6000)});if(r.ok){L("  direct OK");return r}}catch(e){}
+  for(let i=0;i<PX.length;i++){const idx=(px+i)%PX.length;
+    try{const r=await fetch(PX[idx](url),{signal:AbortSignal.timeout(10000)});if(r.ok){px=idx;L("  proxy"+idx+" OK");return r}}catch(e){}}
+  L("  all failed");return null;
+}
+const SP={
+  NBA:{odds:"basketball_nba",icon:"\u{1F3C0}",color:"#C9082A",sid:"10345"},
+  NFL:{odds:"americanfootball_nfl",icon:"\u{1F3C8}",color:"#013369",sid:"10187"},
+  NHL:{odds:"icehockey_nhl",icon:"\u{1F3D2}",color:"#A2AAAD",sid:"10346"},
+  MLB:{odds:"baseball_mlb",icon:"\u26BE",color:"#002D72",sid:"3"},
+  EPL:{odds:"soccer_epl",icon:"\u26BD",color:"#3D195B",sid:"10188"},
+  NCAAB:{odds:"basketball_ncaab",icon:"\u{1F3C0}",color:"#FF6B35",sid:"39"},
+  UFC:{odds:"mma_mixed_martial_arts",icon:"\u{1F94A}",color:"#D20A0A",sid:null}
+};
+let S={sport:"ALL",bank:500,kelly:25,minE:4,exp:null,tab:"edges",ld:true,err:null,upd:null,rq:null,edges:[],ovr:[],pc:0,logs:[]};
+function L(m){S.logs.push(new Date().toLocaleTimeString()+" \u2192 "+m);if(S.logs.length>120)S.logs.shift()}
+function a2i(o){return o>0?100/(o+100)*100:o<0?Math.abs(o)/(Math.abs(o)+100)*100:50}
+function ks(e,p,b,f){var pp=p/100,q=1-pp,bb=(100-p)/p;if(bb<=0)return 0;return Math.round(b*Math.max(0,((pp*bb-q)/bb)*(f/100)))}
+function eC(e){return e>=10?"#00ff88":e>=7?"#fbbf24":"#60a5fa"}
+function eL(e){return e>=10?"STRONG":e>=7?"GOOD":"FAIR"}
+function fT(iso){if(!iso)return"TBD";return new Date(iso).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit",hour12:true})}
+var SKIP=new Set(["the","fc","cf","sc","afc","city","united","real","club","de","la","los","new","san","st","york","angeles","bay","green"]);
+function tw(n){return(n||"").toLowerCase().replace(/[^a-z0-9 ]/g,"").split(/\s+/).filter(function(w){return w.length>2&&!SKIP.has(w)})}
+function sD(a,b){if(!a||!b)return false;return Math.abs(new Date(a)-new Date(b))<48*36e5}
+
+async function getPoly(){
+  L("Fetching Polymarket sports...");var all=[];
+  for(var entry of Object.entries(SP)){var nm=entry[0],cfg=entry[1];
+    if(!cfg.sid)continue;
+    var url1=GM+"/events?series_id="+cfg.sid+"&tag_id=100639&active=true&closed=false&order=startTime&ascending=true&limit=50";
+    L("Fetching "+nm+" (sid="+cfg.sid+")...");
+    var r=await gF(url1);
+    if(r){try{var data=JSON.parse(await r.text());
+      if(Array.isArray(data)){var c=0;
+        data.forEach(function(evt){if(evt.markets&&Array.isArray(evt.markets)){
+          evt.markets.forEach(function(mkt){all.push(Object.assign({},mkt,{eventTitle:evt.title||"",eventSlug:evt.slug||"",startDate:evt.startDate||evt.start_date||"",sportName:nm}));c++})}});
+        L("  "+nm+": "+data.length+" events, "+c+" mkts")}
+    }catch(e){L("  "+nm+" parse err: "+e.message)}}
+    if(!all.some(function(m){return m.sportName===nm})){
+      var url2=GM+"/events?series_id="+cfg.sid+"&active=true&closed=false&order=startTime&ascending=true&limit=30";
+      L("  "+nm+" fallback...");var r2=await gF(url2);
+      if(r2){try{var d2=JSON.parse(await r2.text());
+        if(Array.isArray(d2)){var c2=0;d2.forEach(function(evt){
+          var t=(evt.title||"").toLowerCase();
+          if(t.includes("champion")||t.includes("mvp")||t.includes("award"))return;
+          if(evt.markets){evt.markets.forEach(function(mkt){
+            all.push(Object.assign({},mkt,{eventTitle:evt.title||"",eventSlug:evt.slug||"",startDate:evt.startDate||"",sportName:nm}));c2++})}});
+          L("  "+nm+" fb: "+c2+" mkts")}
+      }catch(e){}}
+    }
+  }
+  // UFC
+  if(!all.some(function(m){return m.sportName==="UFC"})){
+    L("UFC tag scan...");var r3=await gF(GM+"/events?tag_id=100639&active=true&closed=false&limit=50");
+    if(r3){try{var d3=JSON.parse(await r3.text());
+      if(Array.isArray(d3)){var c3=0;d3.forEach(function(evt){
+        var t=(evt.title||"").toLowerCase();
+        if(t.includes("ufc")||t.includes("fight")||t.includes("boxing")){
+          if(evt.markets){evt.markets.forEach(function(mkt){
+            if(!all.some(function(m){return m.conditionId===mkt.conditionId})){
+              all.push(Object.assign({},mkt,{eventTitle:evt.title||"",eventSlug:evt.slug||"",startDate:evt.startDate||"",sportName:"UFC"}));c3++}})}}});
+        L("  UFC: "+c3+" mkts")}
+    }catch(e){}}
+  }
+  var seen=new Set();all=all.filter(function(m){var k=m.conditionId||m.question||Math.random();if(seen.has(k))return false;seen.add(k);return true});
+  L("Total Poly: "+all.length);S.pc=all.length;return all;
+}
+async function getOdds(){L("Fetching sportsbook odds...");var all=[];
+  for(var entry of Object.entries(SP)){var nm=entry[0],cfg=entry[1];
+    try{var r=await fetch(OB+"/sports/"+cfg.odds+"/odds/?apiKey="+OK+"&regions=us&markets=h2h&oddsFormat=american");
+      if(!r.ok){L("  "+nm+": HTTP "+r.status);continue}
+      var h=r.headers.get("x-requests-remaining");if(h)S.rq=parseInt(h);
+      var d=await r.json();
+      if(Array.isArray(d)){L("  "+nm+": "+d.length+" games");d.forEach(function(g){all.push(Object.assign({},g,{sportName:nm}))})}
+      else if(d.message)L("  "+nm+": "+d.message);
+    }catch(e){L("  "+nm+": "+e.message)}}
+  L("Total odds: "+all.length);return all;
+}
+
+function doMatch(odds,poly){
+  var edges=[],ovr=[];L("Matching "+odds.length+" games to "+poly.length+" mkts...");
+  odds.forEach(function(g){if(!g.bookmakers||!g.bookmakers.length)return;
+    var hA=[],aA=[];
+    g.bookmakers.forEach(function(bk){var m=bk.markets?bk.markets.find(function(x){return x.key==="h2h"}):null;
+      if(!m||!m.outcomes)return;
+      m.outcomes.forEach(function(o){if(o.name===g.home_team)hA.push({p:a2i(o.price),b:bk.title});
+        else if(o.name===g.away_team)aA.push({p:a2i(o.price),b:bk.title})})});
+    if(!hA.length||!aA.length)return;
+    var hI=hA.reduce(function(s,o){return s+o.p},0)/hA.length,aI=aA.reduce(function(s,o){return s+o.p},0)/aA.length;
+    var bH=hA.sort(function(a,b){return b.p-a.p})[0],bA=aA.sort(function(a,b){return b.p-a.p})[0];
+    var cfg=SP[g.sportName]||{icon:"?",color:"#888"},gt=fT(g.commence_time);
+    var hW=tw(g.home_team),aW=tw(g.away_team);
+    var bestM=null,bestS=0;
+    poly.forEach(function(mkt){
+      var title=((mkt.question||"")+" "+(mkt.eventTitle||"")).toLowerCase();
+      var score=0,hH=hW.filter(function(w){return title.includes(w)}).length,aH=aW.filter(function(w){return title.includes(w)}).length;
+      score=hH+aH;if(sD(g.commence_time,mkt.startDate))score+=3;
+      if(title.includes("champion")||title.includes("mvp")||title.includes("award")||title.includes("season winner")||title.includes("win the"))return;
+      if((hH>=1&&aH>=1)||score>=4){if(score>bestS){bestS=score;bestM=mkt}}});
+    var pH=null,pA=null,pQ=null,pSlug=null;
+    if(bestM){pSlug=bestM.eventSlug||bestM.slug||null;pQ=bestM.question||null;
+      var outs,prs;
+      try{outs=typeof bestM.outcomes==="string"?JSON.parse(bestM.outcomes):bestM.outcomes||[]}catch(e){outs=[]}
+      try{prs=typeof bestM.outcomePrices==="string"?JSON.parse(bestM.outcomePrices):bestM.outcomePrices||[]}catch(e){prs=[]}
+      if(outs.length>=2&&prs.length>=2){for(var i=0;i<outs.length;i++){
+        var on=(outs[i]||"").toLowerCase(),price=parseFloat(prs[i])*100;if(isNaN(price))continue;
+        if(hW.some(function(w){return on.includes(w)}))pH=price;
+        if(aW.some(function(w){return on.includes(w)}))pA=price}}
+      if(pH&&!pA)pA=100-pH;if(pA&&!pH)pH=100-pA}
+    ovr.push({sport:g.sportName,icon:cfg.icon,game:g.away_team+" @ "+g.home_team,time:gt,
+      hI:Math.round(hI),aI:Math.round(aI),pH:pH?Math.round(pH):null,pA:pA?Math.round(pA):null,
+      nb:g.bookmakers.length,matched:!!bestM,pQ:pQ,pSlug:pSlug});
+    if(pH&&pH>5&&pH<95){var hE=Math.round(hI)-Math.round(pH),aE=Math.round(aI)-Math.round(pA);
+      if(hE>=2&&hE<=30)edges.push({sport:g.sportName,icon:cfg.icon,color:cfg.color,game:g.away_team+" @ "+g.home_team,time:gt,market:"Moneyline",pick:g.home_team,sb:Math.round(hI),pm:Math.round(pH),edge:hE,bk:bH.b,pQ:pQ,pSlug:pSlug,ev:((hI/100)*(100-pH)-((100-hI)/100)*pH).toFixed(1)});
+      if(aE>=2&&aE<=30)edges.push({sport:g.sportName,icon:cfg.icon,color:cfg.color,game:g.away_team+" @ "+g.home_team,time:gt,market:"Moneyline",pick:g.away_team,sb:Math.round(aI),pm:Math.round(pA),edge:aE,bk:bA.b,pQ:pQ,pSlug:pSlug,ev:((aI/100)*(100-pA)-((100-aI)/100)*pA).toFixed(1)})}});
+  edges.sort(function(a,b){return b.edge-a.edge});S.edges=edges;S.ovr=ovr;
+  var mt=ovr.filter(function(o){return o.matched}).length;
+  L("Matched "+mt+"/"+ovr.length+" | "+edges.length+" edges");
+}
+
+async function loadData(){S.ld=true;S.err=null;S.logs=[];render();
+  try{var results=await Promise.all([getPoly(),getOdds()]);doMatch(results[1],results[0]);S.upd=new Date();
+    if(!results[1].length)S.err="Sportsbook API returned no data.";
+    if(S.pc===0)S.err=(S.err||"")+" Polymarket: 0 markets (CORS proxies may be down).";
+  }catch(e){S.err="Error: "+e.message;L("Fatal: "+e.message)}
+  S.ld=false;render();
+}
+function render(){
+  var app=document.getElementById("app");
+  var edg=S.edges.filter(function(b){return(S.sport==="ALL"||b.sport===S.sport)&&b.edge>=S.minE});
+  var ovr=S.ovr.filter(function(b){return S.sport==="ALL"||b.sport===S.sport});
+  var maxE=Math.max.apply(null,edg.map(function(b){return b.edge}).concat([1]));
+  var avgE=edg.length?(edg.reduce(function(s,b){return s+b.edge},0)/edg.length).toFixed(1):"0";
+  var mt=S.ovr.filter(function(o){return o.matched}).length;
+  var h="";
+  h+='<div class="hdr"><div class="hr"><div class="logo"><div class="logo-mark">SA</div><div><div class="tt">STRATFORD <span>ACADEMY</span><span class="badge">v4 LIVE</span></div><div class="su">SPORTSBOOK vs POLYMARKET</div></div></div><div class="status"><div class="status-dot">';
+  h+=S.ld?'<span class="spn"></span>':'<span class="dot-w"><span class="dot"></span><span class="dot-r"></span></span>';
+  h+='<span class="status-label" style="color:'+(S.ld?'#fbbf24':'#00ff88')+'">'+(S.ld?'SCANNING...':'LIVE')+'</span></div>';
+  if(S.upd)h+='<div class="status-time"><span class="live-dot"></span>Updated '+S.upd.toLocaleTimeString()+'</div>';
+  if(S.rq!==null)h+='<div class="status-time">'+S.rq+' API calls left</div>';
+  h+='</div></div></div>';
+  h+='<div class="stats"><div class="stat"><div class="stat-label">VALUE BETS</div><div class="stat-val" style="color:#00ff88">'+edg.length+'</div></div>';
+  h+='<div class="stat"><div class="stat-label">AVG EDGE</div><div class="stat-val" style="color:#fbbf24">'+avgE+'%</div></div>';
+  h+='<div class="stat"><div class="stat-label">MATCHED</div><div class="stat-val" style="color:#60a5fa">'+mt+'/'+S.ovr.length+'</div></div>';
+  h+='<div class="stat"><div class="stat-label">POLYMARKET</div><div class="stat-val" style="color:#a78bfa">'+S.pc+'</div></div></div>';
+  h+='<div class="tabs"><button class="tab '+(S.tab==="edges"?"on":"")+'" onclick="setS(\'tab\',\'edges\')">VALUE BETS ('+edg.length+')</button>';
+  h+='<button class="tab '+(S.tab==="games"?"on":"")+'" onclick="setS(\'tab\',\'games\')">ALL GAMES ('+ovr.length+')</button>';
+  h+='<button class="tab '+(S.tab==="log"?"on":"")+'" onclick="setS(\'tab\',\'log\')">LOG</button></div>';
+  var sps=["ALL"].concat(Object.keys(SP));
+  h+='<div class="sps">';
+  sps.forEach(function(s){var on=S.sport===s;var c=s==="ALL"?edg.length:S.edges.filter(function(b){return b.sport===s&&b.edge>=S.minE}).length;
+    h+='<button class="sp '+(on?'on':'')+'" onclick="setS(\'sport\',\''+s+'\')"><span style="font-size:18px">'+(SP[s]?SP[s].icon:'?')+'</span><span>'+s+'</span>';
+    if(c>0)h+='<span class="sp-count" style="background:'+(on?'#00ff88':'#2a2a35')+';color:'+(on?'#050508':'#888')+'">'+c+'</span>';
+    h+='</button>'});
+  h+='</div>';
+  h+='<div class="sets"><div><div class="set-label">BANKROLL</div><select class="set-sel" style="color:#00ff88" onchange="setS(\'bank\',+this.value)">';
+  [100,250,500,1000,2500,5000,10000].forEach(function(v){h+='<option value="'+v+'"'+(S.bank===v?' selected':'')+'>$'+v.toLocaleString()+'</option>'});
+  h+='</select></div><div><div class="set-label">KELLY %</div><select class="set-sel" style="color:#fbbf24" onchange="setS(\'kelly\',+this.value)">';
+  [10,15,20,25,33,50].forEach(function(v){h+='<option value="'+v+'"'+(S.kelly===v?' selected':'')+'>'+v+'%</option>'});
+  h+='</select></div><div><div class="set-label">MIN EDGE</div><select class="set-sel" style="color:#60a5fa" onchange="setS(\'minE\',+this.value)">';
+  [2,4,6,8,10,15].forEach(function(v){h+='<option value="'+v+'"'+(S.minE===v?' selected':'')+'>&ge;'+v+'%</option>'});
+  h+='</select></div></div>';
+  h+='<button class="rbtn" onclick="loadData()"'+(S.ld?' disabled':'')+'>'+(S.ld?'SCANNING...':'REFRESH \u2014 LIVE PRICES')+'</button>';
+  if(S.err)h+='<div class="err-box">'+S.err+'</div>';
+  if(!S.ld&&!S.err&&S.ovr.length>0)h+='<div class="info-box">'+S.ovr.length+' games \u00B7 '+mt+' matched \u00B7 '+edg.length+' edges \u00B7 Live Gamma API</div>';
+
+  if(S.tab==="edges"){
+    if(!edg.length){h+='<div class="empty"><div class="empty-icon">'+(S.ld?'\u23F3':'\u{1F50D}')+'</div><div class="empty-title">'+(S.ld?'Scanning...':'No value bets right now')+'</div><div class="empty-sub">'+(S.ld?'Checking sportsbooks & Polymarket':'Try \u22652% min edge or check before game times<br>'+mt+'/'+S.ovr.length+' matched')+'</div></div>'}
+    else edg.forEach(function(b,i){
+      var isX=S.exp===i,ecc=eC(b.edge),ell=eL(b.edge),bsz=ks(b.edge,b.sb,S.bank,S.kelly),prf=Math.round(bsz*((100-b.pm)/Math.max(b.pm,1))),bp=Math.min((b.edge/maxE)*100,100);
+      h+='<div class="card'+(isX?' ex':'')+'" style="border-color:'+(isX?ecc+'30':'rgba(255,255,255,.06)')+';animation-delay:'+i*.06+'s" onclick="setS(\'exp\','+(isX?'null':i)+')">';
+      h+='<div class="card-main"><div class="card-top"><div style="flex:1"><div class="pick-row"><span class="pick-icon">'+b.icon+'</span><span class="pick-name">'+b.pick+'</span><span class="edge-badge" style="color:'+ecc+';background:'+ecc+'18">'+ell+'</span></div>';
+      h+='<div class="game-name">'+b.game+'</div><div class="game-meta">'+b.market+' \u00B7 '+b.time+'</div></div>';
+      h+='<div style="text-align:right"><div class="edge-num" style="color:'+ecc+'">+'+b.edge+'%</div><div class="edge-lbl">EDGE</div></div></div>';
+      h+='<div class="odds"><div><div class="odds-label">SPORTSBOOK</div><div class="odds-val" style="color:#00ff88">'+b.sb+'%</div><div class="odds-book">'+b.bk+'</div></div>';
+      h+='<div class="odds-vs">VS</div><div style="text-align:right"><div class="odds-label">POLYMARKET LIVE</div><div class="odds-val" style="color:#ff5555">'+b.pm+'\u00A2</div></div></div>';
+      h+='<div class="ebar"><div class="efill" style="width:'+bp+'%;background:linear-gradient(90deg,'+ecc+'55,'+ecc+')"></div></div></div>';
+      if(isX){
+        h+='<div class="excon"><div class="dgrid"><div class="dbox" style="background:rgba(0,255,136,.05);border:1px solid rgba(0,255,136,.1)"><div class="dbox-label" style="color:#00ff88">KELLY BET</div><div class="dbox-val" style="color:#00ff88">$'+bsz+'</div><div class="dbox-sub">'+((bsz/S.bank)*100).toFixed(1)+'% of roll</div></div>';
+        h+='<div class="dbox" style="background:rgba(251,191,36,.05);border:1px solid rgba(251,191,36,.1)"><div class="dbox-label" style="color:#fbbf24">PROFIT</div><div class="dbox-val" style="color:#fbbf24">$'+prf+'</div><div class="dbox-sub">if '+b.pick+' wins</div></div></div>';
+        h+='<div class="play-box"><div class="play-title">THE PLAY</div><div class="play-text"><span style="color:#00ff88">\u25B8</span> '+b.bk+': <b style="color:#00ff88">'+b.sb+'%</b> implied<br><span style="color:#ff5555">\u25B8</span> Polymarket LIVE: <b style="color:#ff5555">'+b.pm+'\u00A2</b><br><span style="color:'+ecc+'">\u25B8</span> Edge: <b style="color:'+ecc+'">'+b.edge+'%</b><br><span style="color:#fbbf24">\u25B8</span> EV: <b style="color:#fbbf24">+'+b.ev+'\u00A2</b>/dollar</div></div>';
+        if(b.pQ)h+='<div style="margin-top:10px;font-size:10px;color:#555;font-style:italic">"'+b.pQ+'"</div>';
+        h+='<div class="action-box" style="background:'+ecc+'12;border:1px solid '+ecc+'28"><a href="'+(b.pSlug?'https://polymarket.com/event/'+b.pSlug:'https://polymarket.com/sports')+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="text-decoration:none;display:block"><div class="action-text" style="color:'+ecc+'">OPEN ON POLYMARKET \u2192 BUY '+b.pick.toUpperCase()+' @ '+b.pm+'\u00A2</div><div class="action-sub">Suggested: $'+bsz+' ('+S.kelly+'% Kelly)</div></a></div></div>'}
+      h+='</div>'});
+  }
+
+  if(S.tab==="games"){
+    if(!ovr.length){h+='<div class="empty"><div class="empty-icon">'+(S.ld?'\u23F3':'\u{1F4CA}')+'</div><div class="empty-title">'+(S.ld?'Loading...':'No games')+'</div></div>'}
+    else ovr.forEach(function(g,i){
+      h+='<div class="gcard'+(g.matched?' matched':'')+'" style="animation-delay:'+i*.04+'s"'+(g.matched&&g.pSlug?' onclick="window.open(\'https://polymarket.com/event/'+g.pSlug+'\',\'_blank\')" style="cursor:pointer"':'')+'>';
+      h+='<div class="gtop"><div class="gname"><span style="font-size:16px">'+g.icon+'</span>'+g.game+'</div><span class="gtime">'+g.time+'</span></div>';
+      h+='<div class="godds"><div><div class="godds-label">HOME</div><div class="godds-val" style="color:#00ff88">'+g.hI+'%</div><div class="godds-sub" style="color:#444">'+g.nb+' books</div></div>';
+      h+='<div style="text-align:center"><div class="godds-label">AWAY</div><div class="godds-val" style="color:#60a5fa">'+g.aI+'%</div></div>';
+      h+='<div style="text-align:right"><div class="godds-label">POLYMARKET</div><div class="godds-val" style="color:'+(g.pH?'#fbbf24':'#333')+'">'+(g.pH?g.pH+'\u00A2':'\u2014')+'</div>';
+      h+='<div class="godds-sub" style="color:'+(g.matched?'#00ff88':'#333')+'">'+(g.matched?'\u2713 LIVE':'\u2014')+'</div></div></div>';
+      if(g.pQ)h+='<div style="font-size:10px;color:#555;margin-top:6px;font-style:italic">'+g.pQ+'</div>';
+      h+='</div>'});
+  }
+
+  if(S.tab==="log"){
+    h+='<div style="padding:16px 20px"><div style="font-size:14px;color:#00ff88;margin-bottom:12px;font-family:Outfit,sans-serif;font-weight:700">System Log</div>';
+    h+='<div class="log-box">'+S.logs.map(function(l){return'<div>'+l+'</div>'}).join('')+'</div>';
+    h+='<div style="margin-top:16px;font-size:11px;color:#555;line-height:1.8">';
+    h+='<div>Sportsbook: <span style="color:#00ff88">'+S.ovr.length+'</span></div>';
+    h+='<div>Polymarket: <span style="color:#a78bfa">'+S.pc+'</span></div>';
+    h+='<div>Matched: <span style="color:#60a5fa">'+mt+'</span></div>';
+    h+='<div>Edges: <span style="color:#fbbf24">'+S.edges.length+'</span></div>';
+    h+='<div>API left: <span style="color:#00ff88">'+(S.rq||'?')+'</span></div>';
+    h+='<div style="margin-top:12px;padding:10px;background:rgba(0,255,136,.03);border:1px solid rgba(0,255,136,.08);border-radius:6px;color:#00ff88;font-size:10px">v4.1 \u2014 series_id per sport \u00B7 CORS proxy chain \u00B7 Live outcomePrices \u00B7 5min refresh</div></div></div>'}
+
+  h+='<div class="footer"><div class="footer-text">STRATFORD ACADEMY v4.1 \u00B7 LIVE POLYMARKET VIA GAMMA API</div></div>';
+  app.innerHTML=h;
+}
+function setS(k,v){S[k]=v;render()}
+loadData();setInterval(loadData,5*60*1000);
+</script>
+</body>
+</html>
