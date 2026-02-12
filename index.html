@@ -37,7 +37,7 @@ body{background:#050508;color:#f0f0f5;font-family:'Geist Mono','SF Mono',monospa
 .sp{flex:1;padding:12px 8px;background:none;border:none;border-bottom:3px solid transparent;color:#555;cursor:pointer;font-size:10px;font-weight:600;font-family:'Geist Mono',monospace;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .2s}
 .sp:hover{color:#888;background:rgba(255,255,255,.02)}.sp.on{border-bottom-color:#00ff88;color:#00ff88;background:rgba(0,255,136,.04)}
 .sp-count{font-size:8px;padding:2px 7px;border-radius:10px;font-weight:800}
-.sets{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;background:rgba(255,255,255,.015)}
+.sets{padding:14px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;background:rgba(255,255,255,.015)}
 .set-label{font-size:9px;color:#555;letter-spacing:2.5px;margin-bottom:5px;font-weight:600}
 .set-sel{width:100%;padding:8px 10px;background:#0c0c14;border:1px solid rgba(255,255,255,.08);border-radius:6px;font-size:13px;font-family:'Geist Mono',monospace;font-weight:600;cursor:pointer;color:#eee}
 .rbtn{width:calc(100% - 40px);padding:12px;background:rgba(0,255,136,.06);border:1px solid rgba(0,255,136,.15);border-radius:8px;color:#00ff88;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:1.5px;font-family:'Geist Mono',monospace;margin:12px 20px;transition:all .2s}
@@ -104,7 +104,7 @@ const SP={
   NCAAB:{odds:"basketball_ncaab",icon:"\u{1F3C0}",color:"#FF6B35",sid:"39"},
   UFC:{odds:"mma_mixed_martial_arts",icon:"\u{1F94A}",color:"#D20A0A",sid:null}
 };
-let S={sport:"ALL",bank:500,kelly:25,minE:4,exp:null,tab:"edges",ld:true,err:null,upd:null,rq:null,edges:[],ovr:[],pc:0,logs:[]};
+let S={sport:"ALL",bank:500,kelly:25,minE:4,minSB:0,exp:null,tab:"edges",ld:true,err:null,upd:null,rq:null,edges:[],ovr:[],pc:0,logs:[]};
 function L(m){S.logs.push(new Date().toLocaleTimeString()+" \u2192 "+m);if(S.logs.length>120)S.logs.shift()}
 function a2i(o){return o>0?100/(o+100)*100:o<0?Math.abs(o)/(Math.abs(o)+100)*100:50}
 function ks(e,p,b,f){var pp=p/100,q=1-pp,bb=(100-p)/p;if(bb<=0)return 0;return Math.round(b*Math.max(0,((pp*bb-q)/bb)*(f/100)))}
@@ -219,7 +219,7 @@ async function loadData(){S.ld=true;S.err=null;S.logs=[];render();
 }
 function render(){
   var app=document.getElementById("app");
-  var edg=S.edges.filter(function(b){return(S.sport==="ALL"||b.sport===S.sport)&&b.edge>=S.minE});
+  var edg=S.edges.filter(function(b){return(S.sport==="ALL"||b.sport===S.sport)&&b.edge>=S.minE&&b.sb>=S.minSB});
   var ovr=S.ovr.filter(function(b){return S.sport==="ALL"||b.sport===S.sport});
   var maxE=Math.max.apply(null,edg.map(function(b){return b.edge}).concat([1]));
   var avgE=edg.length?(edg.reduce(function(s,b){return s+b.edge},0)/edg.length).toFixed(1):"0";
@@ -240,7 +240,7 @@ function render(){
   h+='<button class="tab '+(S.tab==="log"?"on":"")+'" onclick="setS(\'tab\',\'log\')">LOG</button></div>';
   var sps=["ALL"].concat(Object.keys(SP));
   h+='<div class="sps">';
-  sps.forEach(function(s){var on=S.sport===s;var c=s==="ALL"?edg.length:S.edges.filter(function(b){return b.sport===s&&b.edge>=S.minE}).length;
+  sps.forEach(function(s){var on=S.sport===s;var c=s==="ALL"?edg.length:S.edges.filter(function(b){return b.sport===s&&b.edge>=S.minE&&b.sb>=S.minSB}).length;
     h+='<button class="sp '+(on?'on':'')+'" onclick="setS(\'sport\',\''+s+'\')"><span style="font-size:18px">'+(SP[s]?SP[s].icon:'?')+'</span><span>'+s+'</span>';
     if(c>0)h+='<span class="sp-count" style="background:'+(on?'#00ff88':'#2a2a35')+';color:'+(on?'#050508':'#888')+'">'+c+'</span>';
     h+='</button>'});
@@ -251,6 +251,8 @@ function render(){
   [10,15,20,25,33,50].forEach(function(v){h+='<option value="'+v+'"'+(S.kelly===v?' selected':'')+'>'+v+'%</option>'});
   h+='</select></div><div><div class="set-label">MIN EDGE</div><select class="set-sel" style="color:#60a5fa" onchange="setS(\'minE\',+this.value)">';
   [2,4,6,8,10,15].forEach(function(v){h+='<option value="'+v+'"'+(S.minE===v?' selected':'')+'>&ge;'+v+'%</option>'});
+  h+='</select></div><div><div class="set-label">MIN PROB</div><select class="set-sel" style="color:#a78bfa" onchange="setS(\'minSB\',+this.value)">';
+  [0,40,50,55,60,70].forEach(function(v){h+='<option value="'+v+'"'+(S.minSB===v?' selected':'')+'>'+(v===0?'ANY':'&ge;'+v+'%')+'</option>'});
   h+='</select></div></div>';
   h+='<button class="rbtn" onclick="loadData()"'+(S.ld?' disabled':'')+'>'+(S.ld?'SCANNING...':'REFRESH \u2014 LIVE PRICES')+'</button>';
   if(S.err)h+='<div class="err-box">'+S.err+'</div>';
